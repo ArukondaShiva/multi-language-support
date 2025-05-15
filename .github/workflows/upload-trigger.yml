@@ -1,0 +1,26 @@
+name: Trigger Spring Boot Import API on CSV Upload
+
+on:
+  push:
+    paths:
+      - '**.csv'
+
+jobs:
+  upload-and-trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Find the latest CSV file
+        id: find_file
+        run: |
+          file=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '.csv' | head -n 1)
+          echo "csv_file=$file" >> $GITHUB_OUTPUT
+
+      - name: Call Spring Boot API with CSV
+        if: steps.find_file.outputs.csv_file != ''
+        run: |
+          curl -X POST "http://localhost:8080/import?tenantId=0" \
+            -F "file=@${{ steps.find_file.outputs.csv_file }}"
