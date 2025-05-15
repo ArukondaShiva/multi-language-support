@@ -22,5 +22,5 @@ jobs:
       - name: Call Spring Boot API with CSV
         if: steps.find_file.outputs.csv_file != ''
         run: |
-          curl -X POST "http://localhost:8080/import?tenantId=0" \
+          curl -X POST "http://localhost:8092/resource-bundle/import?tenantId=0" \
             -F "file=@${{ steps.find_file.outputs.csv_file }}"
